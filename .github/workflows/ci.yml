@@ -2,7 +2,7 @@ name: Healthcare Email Triage CI
 
 on:
   push:
-    branches:[master]
+    branches: [master]
   pull_request:
     branches: [master]
 

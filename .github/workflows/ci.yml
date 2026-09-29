@@ -47,7 +47,7 @@ jobs:
 
       - name: Initialize database
         run: |
-          PGPSSWORD=testpassword psql -h 127.0.0.1 -U postgres -d healthcare_email_triage -f init.sql
+          POSTGRES_PASSWORD=testpassword psql -h 127.0.0.1 -U postgres -d healthcare_email_triage -f init.sql
 
       - name: Run tests
         run: pytest -v

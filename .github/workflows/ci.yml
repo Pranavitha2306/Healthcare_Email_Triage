@@ -46,8 +46,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Initialize database
+        env:
+          PGPASSWORD: testpassword
         run: |
-          POSTGRES_PASSWORD=testpassword psql -h 127.0.0.1 -U postgres -d healthcare_email_triage -f init.sql
+          psql -h 127.0.0.1 -U postgres -d healthcare_email_triage -f init.sql
 
       - name: Run tests
         run: pytest -v

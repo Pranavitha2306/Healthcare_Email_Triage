@@ -1,3 +1,21 @@
+# Healthcare Email Triage
+
+An AI-powered email triage systemdesigned to automatically process incoming healthcare emails, classify their category and priority, determine the required action, and route them to the appropriate department.
+
+The system integrates Gmail, AI-based classification, FastAPI, PostgreSQL, Docker, automated testing, and GitHub Actions CI to demonstrate an end-to-end production-oriented workflow.
+
+## Key Features
+- Reads incoming emails through the Gmail API
+- Extracts and processes Gmail content automatically
+- Classifies emails by category and priority
+- Determines the recommended action and responsible department
+- Stores processed results in PostgreSQL
+- Prevents duplicate processing using Gmail
+- Exposes triage functionally through a FastAPI REST API
+- Includes automated testing with Pytest
+- Supports containerized execution with Docker
+- Runs automated CI tests using GitHub Actions
+
 ## How It Works
 
 Reads incoming emails from Gmail.

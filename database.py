@@ -18,7 +18,7 @@ connection = psycopg2.connect(
 
 print("Database connected successfully!")
 
-def save_to_database(email, result, action, gmail_message_id):
+def save_to_database(email, result, action, gmail_message_id=None):
 
     cursor = connection.cursor()
 

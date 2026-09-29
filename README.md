@@ -50,3 +50,5 @@ Start the application and PostgreSQL database:
 The FastAPI application will be available on port 8000.
 PostgreSQL runs inside Docker and is exposed on port 5434.
 
+## CI/CD
+GitHub action automatically runs the project tests with PostgreSQL whenever code changes are pushed.

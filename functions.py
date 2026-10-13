@@ -60,6 +60,10 @@ def classify_email(client, email):
 
        Email:
        {email}
+       
+       Category rules:
+       If the email describes symptoms, pain, a health problem, or a possible medical emergency,
+       choose "Medical Question" even is the patient also asks about an appointment, billing, or anything else.
 
        Also determine the priority as Low, Medium, or High
        Priority rules:

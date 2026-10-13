@@ -82,14 +82,17 @@ def load_documents():
     return documents
 
 
-def chunk_text(text):
-    paragraphs = text.split("\n")
-
+def chunk_text(text, words_per_chunk=80, overlap_words=20):
+    words = text.split()
     chunks = []
+    step = words_per_chunk - overlap_words
 
-    for paragraph in paragraphs:
-        if paragraph.strip():
-            chunks.append(paragraph.strip())
+    for start in range(0, len(words), step):
+        chunk_words = words[start:start + words_per_chunk]
+        chunks.append(" ".join(chunk_words))
+
+        if start + words_per_chunk >= len(words):
+            break
 
     return chunks
 

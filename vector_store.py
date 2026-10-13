@@ -63,7 +63,7 @@ def retrieve_context(query):
 
     results = index.query(
         vector = query_embedding.tolist(),
-        top_k=20,
+        top_k=5,
         include_metadata = True
 )
 

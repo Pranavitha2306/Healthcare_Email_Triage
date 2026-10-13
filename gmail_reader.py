@@ -70,7 +70,7 @@ def check_gmail():
         print("Retrieved context: ", retrieved_context)
         print("AI Draft Response:", draft_response)
 
-        save_to_database(body, result, action, gmail_message_id, draft_response)
+        save_to_database(body, result, action, gmail_message_id, draft_response, sender=sender, subject=subject)
         mail.store(email_id, "+FLAGS", "\\Seen")
         print("AI Result:", result)
 

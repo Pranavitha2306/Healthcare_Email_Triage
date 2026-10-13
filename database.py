@@ -18,12 +18,12 @@ connection = psycopg2.connect(
 
 print("Database connected successfully!")
 
-def save_to_database(email, result, action, gmail_message_id=None, draft_response=None):
+def save_to_database(email, result, action, gmail_message_id=None, draft_response=None, sender=None, subject=None):
 
     cursor = connection.cursor()
 
     cursor.execute(
-        "INSERT INTO emails (email_text, category, priority, reason, action, department, gmail_message_id, draft_response) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO emails (email_text, category, priority, reason, action, department, gmail_message_id, draft_response, sender, subject) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             email,
             result["Category"],
@@ -32,7 +32,9 @@ def save_to_database(email, result, action, gmail_message_id=None, draft_respons
             action,
             result["Department"],
             gmail_message_id,
-            draft_response
+            draft_response,
+            sender,
+            subject
         )
 
     )

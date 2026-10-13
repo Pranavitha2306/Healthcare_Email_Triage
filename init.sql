@@ -6,6 +6,9 @@ priority VARCHAR(50),
 reason TEXT,
 action VARCHAR(100),
 department VARCHAR(100),
-status VARCHAR(50) DEFAULT 'NEW',
-gmail_message_id VARCHAR(100)
+status VARCHAR(50) DEFAULT 'PENDING_REVIEW',
+gmail_message_id VARCHAR(100),
+draft_response TEXT
+reviewed_by VARCHAR(100),
+reviewed_at TIMESTAMP
 );

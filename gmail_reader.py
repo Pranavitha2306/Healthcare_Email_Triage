@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 from functions import classify_email, get_action, get_department
 from openai import OpenAI
 from database import save_to_database, email_already_processed
+from vector_store import retrieve_context
+from llm_service import generate_response
+
+
 load_dotenv()
 
 client = OpenAI()
@@ -44,11 +48,17 @@ def check_gmail():
         print("Subject: ", subject)
         print("Body: ", body)
 
+        retrieved_context = retrieve_context(body)
+        draft_response = generate_response(body, retrieved_context)
+
+        print("Retrieved context: ", retrieved_context)
+        print("AI Draft Response:", draft_response)
+
         result = classify_email(client, body)
         action = get_action(result["Priority"])
         department = get_department(result["Category"])
         result["Department"] = department
-        save_to_database(body, result, action, gmail_message_id)
+        save_to_database(body, result, action, gmail_message_id, draft_response)
         print("AI Result:", result)
 
     mail.close()
@@ -61,4 +71,4 @@ while True:
     except Exception as error:
         print("Error while processing Gmail:", error)
 
-    time.sleep(30)
+    time.sleep(10)

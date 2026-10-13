@@ -1,4 +1,3 @@
-# Docker rebuild test
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -6,7 +5,7 @@ from typing import Literal
 from dotenv import load_dotenv
 from openai import OpenAI
 from functions import classify_email, get_action, get_department
-from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status
+from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -65,8 +64,39 @@ def read_emails_by_Priority(Priority: str):
     return get_emails_by_Priority(Priority)
 
 @app.put("/emails/{email_id}/status")
-def change_email_status(email_id: int, status: Literal["New", "InReview", "Completed"]):
-    updated = update_email_status(email_id, status)
+def change_email_status(
+        email_id: int,
+        status: Literal["PENDING_REVIEW", "APPROVED", "REJECTED"],
+        reviewer: str
+):
+    email = get_email_by_id(email_id)
+
+    if email is None:
+        raise HTTPException(
+            status_code = 404,
+            detail = "Email not found"
+        )
+
+    current_status = get_email_status(email_id)
+    if current_status in ["APPROVED", "REJECTED"]:
+        raise HTTPException(
+            status_code = 400,
+            detail = "This email has already been reviewed"
+        )
+
+    if current_status == "NEW" and status != "PENDING_REVIEW":
+        raise HTTPException(
+            status_code=400,
+            detail="New emails must be moved to PENDING_REVIEW first"
+        )
+
+    if current_status == "PENDING_REVIEW" and status not in ["APPROVED", "REJECTED"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Pending emails can only be APPROVED or REJECTED"
+        )
+
+    updated = update_email_status(email_id, status, reviewer)
     if updated ==0:
         raise HTTPException(
             status_code=404,
@@ -78,4 +108,14 @@ def change_email_status(email_id: int, status: Literal["New", "InReview", "Compl
         "email_id": email_id,
         "status": status
     }
+
+@app.get("/emails/id/{email_id}")
+def read_email_by_id(email_id: int):
+    email = get_email_by_id(email_id)
+    if email is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Email not found"
+        )
+    return email
 

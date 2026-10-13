@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
-DB_PORT = os.getenv("DB_PORT", "5434")
+DB_PORT = os.getenv("DB_PORT", "5540")
 print("DB_HOST =", repr(DB_HOST))
 print("DB_PORT =", repr(DB_PORT))
 
@@ -18,12 +18,12 @@ connection = psycopg2.connect(
 
 print("Database connected successfully!")
 
-def save_to_database(email, result, action, gmail_message_id=None):
+def save_to_database(email, result, action, gmail_message_id=None, draft_response=None):
 
     cursor = connection.cursor()
 
     cursor.execute(
-        "INSERT INTO emails (email_text, category, priority, reason, action, department, gmail_message_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO emails (email_text, category, priority, reason, action, department, gmail_message_id, draft_response) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
         (
             email,
             result["Category"],
@@ -31,7 +31,8 @@ def save_to_database(email, result, action, gmail_message_id=None):
             result["Reason"],
             action,
             result["Department"],
-            gmail_message_id
+            gmail_message_id,
+            draft_response
         )
 
     )
@@ -101,7 +102,7 @@ def get_emails_by_Priority(Priority):
     conn.close()
     return rows
 
-def update_email_status(email_id, status):
+def update_email_status(email_id, status, reviewer):
     conn = psycopg2.connect(
         host=DB_HOST,
         port=DB_PORT,
@@ -112,8 +113,14 @@ def update_email_status(email_id, status):
     )
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE emails SET STATUS = %s WHERE id = %s",
-        (status, email_id,)
+        """
+        UPDATE emails 
+        SET STATUS = %s,
+            reviewed_by = %s,
+            reviewed_at = CURRENT_TIMESTAMP
+        WHERE id = %s
+        """,
+        (status, reviewer, email_id,)
     )
     updated = cursor.rowcount
     conn.commit()
@@ -122,6 +129,46 @@ def update_email_status(email_id, status):
     return updated
 
 
+def get_email_by_id(email_id):
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database="healthcare_email_triage",
+        user="postgres",
+        password=os.getenv("POSTGRES_PASSWORD")
+
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM emails WHERE id = %s",
+        (email_id,)
+    )
+    email = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return email
+
+def get_email_status(email_id):
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database="healthcare_email_triage",
+        user="postgres",
+        password=os.getenv("POSTGRES_PASSWORD")
+
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT status FROM emails WHERE id = %s",
+        (email_id, )
+    )
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return result[0] if result else None
 
 
 

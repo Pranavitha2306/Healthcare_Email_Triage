@@ -3,7 +3,7 @@ import email
 import imaplib
 import time
 from dotenv import load_dotenv
-from functions import classify_email, get_action, get_department
+from functions import classify_email, get_action, get_department, ClassificationError
 from openai import OpenAI
 from database import save_to_database, email_already_processed
 from vector_store import retrieve_context
@@ -26,14 +26,16 @@ def check_gmail():
 
     for email_id in email_ids:
         print(email_id)
-        status, msg_data = mail.fetch(email_id, "(RFC822)")
+        status, msg_data = mail.fetch(email_id, "(BODY.PEEK[])")
         raw_email = msg_data[0][1]
         msg = email.message_from_bytes(raw_email)
         gmail_message_id = msg["Message-ID"]
 
         if email_already_processed(gmail_message_id):
             print("Email already processed. Skipping.")
+            mail.store(email_id, "+FLAGS", "\\Seen")
             continue
+
         sender = msg["From"]
         subject = msg["Subject"]
         body = ""
@@ -48,17 +50,28 @@ def check_gmail():
         print("Subject: ", subject)
         print("Body: ", body)
 
+        try:
+            result = classify_email(client, body)
+        except ClassificationError as error:
+            print("Classification failed. Sending to Human Review:", error)
+            result = {
+                "Category": "Human Review",
+                "Priority": "Medium",
+                "Reason": f"Automatic classification failed: {error}",
+            }
+
+        action = get_action(result["Priority"])
+        department = get_department(result["Category"])
+        result["Department"] = department
+
         retrieved_context = retrieve_context(body)
-        draft_response = generate_response(body, retrieved_context)
+        draft_response = generate_response(body, retrieved_context,result["Category"], result["Priority"] )
 
         print("Retrieved context: ", retrieved_context)
         print("AI Draft Response:", draft_response)
 
-        result = classify_email(client, body)
-        action = get_action(result["Priority"])
-        department = get_department(result["Category"])
-        result["Department"] = department
         save_to_database(body, result, action, gmail_message_id, draft_response)
+        mail.store(email_id, "+FLAGS", "\\Seen")
         print("AI Result:", result)
 
     mail.close()

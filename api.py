@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Literal
 from dotenv import load_dotenv
 from openai import OpenAI
-from functions import classify_email, get_action, get_department
+from functions import classify_email, get_action, get_department, ClassificationError
 from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status
 import logging
 
@@ -41,6 +41,13 @@ def triage_email(request: EmailRequest):
 
         logger.info("Email triage completed successfully")
         return result
+
+    except ClassificationError as e:
+        logger.error(f"Classification failed: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail="AI classification failed. Please try again."
+        )
 
     except Exception as e:
         logger.error(f"Email triage failed: {e}")

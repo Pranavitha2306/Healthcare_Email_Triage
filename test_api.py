@@ -18,7 +18,7 @@ def test_get_action():
     assert result == "Send for urgent review"
 
 def test_email_not_found():
-    response = client.put("/emails/999/status?status=Completed")
+    response = client.put("/emails/999/status?status=APPROVED&reviewer=tester")
     assert response.status_code==404
 
 @patch("api.classify_email")

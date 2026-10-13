@@ -2,6 +2,20 @@ import csv
 import os
 import json
 
+CATEGORIES =[
+    "Billing",
+    "Appointment",
+    "Medical Records",
+    "Prescription",
+    "Insurance",
+    "Medical Questions",
+    "Human Review",
+]
+PRIORITIES = ["Low", "Medium", "High"]
+
+class ClassificationError(Exception):
+    """Raised when the AI's answer is missing, not JSON, or has invalid values."""
+
 def get_action(Priority):
     if Priority == "High":
         return "Send for urgent review"
@@ -30,9 +44,6 @@ def save_to_csv(email, result, action):
 
 def classify_email(client, email):
    try:
-       if "error" in email.lower():
-           return None
-
        response = client.responses.create(
        model="gpt-5-nano",
        text={"format": {"type" : "json_object"}},
@@ -54,25 +65,25 @@ def classify_email(client, email):
        Priority rules:
        Low = routine request with no urgency.
        Medium = time-sensitive request that needs attention soon.
-       High = urgent issue that needs immediate attention.
+       High = urgent issue that needs immediate attention, including any possible medical emergency.
        
        Give a short reason for your decision.
 
        Return the result only as valid JSON exactly like this:
        {{
-          "Category": "<category>"
-          "Priority": "<priority>"
+          "Category": "<category>",
+          "Priority": "<priority>",
           "Reason": "<reason>"
       }}
       """
        )
 
        result = json.loads(response.output_text)
-       return result
+       return validate_classification(result)
 
-   except Exception as e:
-      print("Error:", e)
-      return None
+   except json.JSONDecodeError as error:
+       raise ClassificationError(f"Model did not return valid JSON: {error}")
+
 
 def get_department(Category):
     if Category == "Appointment":
@@ -85,4 +96,18 @@ def get_department(Category):
         return "Human Review"
 
 
+def validate_classification(result):
+    if not isinstance(result, dict):
+        raise ClassificationError("Result is not a JSON object")
 
+    for field in ["Category", "Priority", "Reason"]:
+        if field not in result:
+            raise ClassificationError(f"Missing field: {field}")
+
+        if result["Category"] not in CATEGORIES:
+            raise ClassificationError(f"Invalid category: {result['Category']}")
+
+        if result["Priority"] not in PRIORITIES:
+            raise ClassificationError(f"Invalid priority: {result['Priority']}")
+
+        return result

@@ -140,7 +140,7 @@ def get_email_by_id(email_id):
         password=os.getenv("POSTGRES_PASSWORD")
 
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cursor.execute(
         "SELECT * FROM emails WHERE id = %s",
         (email_id,)

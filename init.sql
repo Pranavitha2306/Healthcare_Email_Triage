@@ -12,5 +12,7 @@ draft_response TEXT,
 reviewed_by VARCHAR(100),
 reviewed_at TIMESTAMP,
 sender TEXT,
-subject TEXT
+subject TEXT,
+final_response TEXT,
+rejection_reason TEXT
 );

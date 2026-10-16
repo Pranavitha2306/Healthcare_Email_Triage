@@ -34,7 +34,7 @@ def save_to_database(email, result, action, gmail_message_id=None, draft_respons
             gmail_message_id,
             draft_response,
             sender,
-            subject
+            subject,
         )
 
     )
@@ -201,3 +201,43 @@ def get_review_queue():
     cursor.close()
     conn.close()
     return rows
+
+def save_final_response(email_id, final_response):
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database="healthcare_email_triage",
+        user="postgres",
+        password=os.getenv("POSTGRES_PASSWORD")
+
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE emails SET final_response = %s WHERE id = %s",
+        (final_response, email_id)
+    )
+    updated = cursor.rowcount
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return updated
+
+def save_rejection_reason(email_id, rejection_reason):
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database="healthcare_email_triage",
+        user="postgres",
+        password=os.getenv("POSTGRES_PASSWORD")
+
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE emails SET rejection_reason = %s WHERE id = %s",
+        (rejection_reason, email_id)
+    )
+    updated = cursor.rowcount
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return updated

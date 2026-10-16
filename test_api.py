@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from api import app
 from functions import get_action
 from unittest.mock import patch
+from database import save_to_database
 
 client = TestClient(app)
 
@@ -21,8 +22,9 @@ def test_email_not_found():
     response = client.put("/emails/999/status?status=APPROVED&reviewer=tester")
     assert response.status_code==404
 
+@patch("api.save_to_database", return_value=1)
 @patch("api.classify_email")
-def test_triage_with_mock(mock_classify_email):
+def test_triage_with_mock(mock_classify_email, mock_save):
     mock_classify_email.return_value = {
         "Category" : "Prescription",
         "Priority" : "High",

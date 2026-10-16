@@ -5,7 +5,7 @@ from typing import Literal
 from dotenv import load_dotenv
 from openai import OpenAI
 from functions import classify_email, get_action, get_department, ClassificationError
-from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status
+from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status, get_review_queue
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -126,3 +126,6 @@ def read_email_by_id(email_id: int):
         )
     return email
 
+@app.get("/review-queue")
+def read_review_queue():
+    return get_review_queue()

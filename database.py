@@ -173,4 +173,31 @@ def get_email_status(email_id):
     return result[0] if result else None
 
 
+def get_review_queue():
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database="healthcare_email_triage",
+        user="postgres",
+        password=os.getenv("POSTGRES_PASSWORD")
 
+    )
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(
+        """
+        SELECT id, sender, subject, category, priority, department, reason, draft_response
+        FROM emails
+        WHERE status = 'PENDING_REVIEW'
+        ORDER BY 
+            CASE priority
+                WHEN 'High' THEN 1
+                WHEN 'Medium' THEN 2
+                ELSE 3
+            END,
+            id ASC
+        """
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows

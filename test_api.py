@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 from api import app
 from functions import get_action
 from unittest.mock import patch
-from database import save_to_database
 
 client = TestClient(app)
 
@@ -37,4 +36,15 @@ def test_triage_with_mock(mock_classify_email, mock_save):
     )
 
     assert response.status_code ==200
+
+@patch("api.get_email_status", return_value="PENDING_REVIEW")
+@patch("api.get_email_by_id", return_value={"id":5, "status": "PENDING_REVIEW"})
+def test_reject_without_reason(mock_get_email, mock_get_status):
+    response = client.put("/emails/5/status?status=REJECTED&reviewer=Lisa")
+    assert response.status_code == 400
+
+@patch("api.get_email_by_id", return_valur={"id":5, "status": "APPRIVED"})
+def test_edit_approved_draft(mock_get_email):
+    response = client.put("/emails/5/draft", json={"final_response": "New reply"})
+    assert response.status_code == 400
 

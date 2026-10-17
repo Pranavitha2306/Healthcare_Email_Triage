@@ -5,7 +5,7 @@ from typing import Literal
 from dotenv import load_dotenv
 from openai import OpenAI
 from functions import classify_email, get_action, get_department, ClassificationError
-from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status, get_review_queue
+from database import save_to_database, get_all_emails, get_emails_by_department, get_emails_by_Priority, update_email_status, get_email_by_id, get_email_status, get_review_queue, save_final_response, save_rejection_reason
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +22,9 @@ def home():
 
 class EmailRequest(BaseModel):
     email:str
+
+class EditDraftRequest(BaseModel):
+    final_response: str
 
 @app.post("/triage")
 def triage_email(request: EmailRequest):
@@ -74,7 +77,8 @@ def read_emails_by_Priority(Priority: str):
 def change_email_status(
         email_id: int,
         status: Literal["PENDING_REVIEW", "APPROVED", "REJECTED"],
-        reviewer: str
+        reviewer: str,
+        rejection_reason: str | None = None
 ):
     email = get_email_by_id(email_id)
 
@@ -103,12 +107,20 @@ def change_email_status(
             detail="Pending emails can only be APPROVED or REJECTED"
         )
 
+    if status == "REJECTED" and not (rejection_reason and rejection_reason.strip()):
+        raise HTTPException(
+            status_code=400,
+            detail="A rejection reason is required when rejecting a draft"
+        )
+
     updated = update_email_status(email_id, status, reviewer)
     if updated ==0:
         raise HTTPException(
             status_code=404,
             detail="Email not found"
         )
+    if status == "REJECTED":
+        save_rejection_reason(email_id, rejection_reason)
 
     return{
         "message": "Status updated successfully",
@@ -129,3 +141,24 @@ def read_email_by_id(email_id: int):
 @app.get("/review-queue")
 def read_review_queue():
     return get_review_queue()
+
+@app.put("/emails/{email_id}/draft")
+def edit_draft(email_id: int, request: EditDraftRequest):
+    email = get_email_by_id(email_id)
+
+    if email is None:
+        raise HTTPException(status_code=404, detail="Email not found")
+
+    if email["status"] != "PENDING_REVIEW":
+        raise HTTPException(status_code = 400, detail="Only drafts waiting for review can be edited")
+
+    if not request.final_response.strip():
+        raise HTTPException(status_code=400, detail="Reply cannot be empty")
+
+    save_final_response(email_id, request.final_response)
+
+    return{
+        "message": "Draft updated successfully",
+        "email_id": email_id
+    }
+

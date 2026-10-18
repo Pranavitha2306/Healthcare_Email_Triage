@@ -8,6 +8,7 @@ from openai import OpenAI
 from database import save_to_database, email_already_processed
 from vector_store import retrieve_context
 from llm_service import generate_response
+from agent import agent
 
 
 load_dotenv()
@@ -50,29 +51,15 @@ def check_gmail():
         print("Subject: ", subject)
         print("Body: ", body)
 
-        try:
-            result = classify_email(client, body)
-        except ClassificationError as error:
-            print("Classification failed. Sending to Human Review:", error)
-            result = {
-                "Category": "Human Review",
-                "Priority": "Medium",
-                "Reason": f"Automatic classification failed: {error}",
-            }
+        final_state = agent.invoke({
+            "email_text": body,
+            "sender": sender,
+            "subject": subject,
+            "gmail_message_id": gmail_message_id,
+        })
 
-        action = get_action(result["Priority"])
-        department = get_department(result["Category"])
-        result["Department"] = department
-
-        retrieved_context = retrieve_context(body)
-        draft_response = generate_response(body, retrieved_context,result["Category"], result["Priority"] )
-
-        print("Retrieved context: ", retrieved_context)
-        print("AI Draft Response:", draft_response)
-
-        save_to_database(body, result, action, gmail_message_id, draft_response, sender=sender, subject=subject)
         mail.store(email_id, "+FLAGS", "\\Seen")
-        print("AI Result:", result)
+        print("Agent route:", final_state["route"], "| Saved as email", final_state["email_id"])
 
     mail.close()
     mail.logout()

@@ -1,0 +1,24 @@
+email,expected_category,expected_route
+"I have chest pain and my left arm is numb. What should I do?",Medical Questions,emergency
+"My father collapsed and is not waking up.",Medical Questions,emergency
+"I took too many of my sleeping pills by accident.",Medical Questions,emergency
+"Sudden weakness on one side of my face and slurred speech since this morning.",Medical Questions,emergency
+"I feel like I can't go on anymore and want to end my life.",Medical Questions,emergency
+"Severe chest pain and sweating, can I book a cardiology appointment?",Medical Questions,emergency
+"Can I set up a payment plan for my bill?",Billing,normal
+"I was charged twice for my visit last month. Can you fix it?",Billing,normal
+"Why is my bill higher than my estimate?",Billing,normal
+"I need to reschedule my appointment next Tuesday.",Appointment,normal
+"What is your cancellation policy for appointments?",Appointment,normal
+"Can I book a new patient appointment with a family doctor?",Appointment,normal
+"How do I request a copy of my medical records?",Medical Records,normal
+"Please send my lab results to my new doctor.",Medical Records,normal
+"I need a refill of my blood pressure medication.",Prescription,normal
+"My pharmacy says my prescription was not sent. Can you check?",Prescription,normal
+"Does Medicare cover my annual checkup?",Insurance,normal
+"I have had a mild cough for three days. Should I see a doctor?",Medical Questions,normal
+"Can I bring my service dog to my appointment?",Appointment,normal
+"Where can I park when I visit the clinic?",Human Review,normal
+"Are you hiring nurses right now?",Human Review,no_documents
+"Can you recommend a good dentist near the clinic?",Human Review,no_documents
+"Is there a cafeteria in the building?",Human Review,no_documents

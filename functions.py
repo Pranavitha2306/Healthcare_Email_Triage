@@ -99,8 +99,15 @@ def get_department(Category):
     else:
         return "Human Review"
 
+def normalize_label(value, allowed):
+    cleaned = str(value).strip().lower().rstrip("s")
+    for option in allowed:
+        if option.lower().rstrip("s") == cleaned:
+            return option
+    return value
 
 def validate_classification(result):
+
     if not isinstance(result, dict):
         raise ClassificationError("Result is not a JSON object")
 
@@ -108,10 +115,13 @@ def validate_classification(result):
         if field not in result:
             raise ClassificationError(f"Missing field: {field}")
 
-        if result["Category"] not in CATEGORIES:
-            raise ClassificationError(f"Invalid category: {result['Category']}")
+    result["Category"] = normalize_label(result["Category"], CATEGORIES)
+    result["Priority"] = normalize_label(result["Priority"], PRIORITIES)
 
-        if result["Priority"] not in PRIORITIES:
-            raise ClassificationError(f"Invalid priority: {result['Priority']}")
+    if result["Category"] not in CATEGORIES:
+        raise ClassificationError(f"Invalid category: {result['Category']}")
 
-        return result
+    if result["Priority"] not in PRIORITIES:
+        raise ClassificationError(f"Invalid priority: {result['Priority']}")
+
+    return result

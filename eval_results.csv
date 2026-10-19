@@ -1,0 +1,24 @@
+email,expected_category,got_category,expected_route,got_route,reason
+I have chest pain and my left arm is numb. What should I do?,Medical Questions,Medical Questions,emergency,emergency,Symptoms described (chest pain and left arm numb) suggest a possible medical emergency and require immediate attention.
+My father collapsed and is not waking up.,Medical Questions,Medical Questions,emergency,emergency,"Describes a medical emergency (collapse and unresponsive), requires immediate attention."
+I took too many of my sleeping pills by accident.,Medical Questions,Medical Questions,emergency,emergency,"Indicates an accidental overdose on sleeping pills, a potential medical emergency requiring immediate attention."
+Sudden weakness on one side of my face and slurred speech since this morning.,Medical Questions,Medical Questions,emergency,emergency,Sudden facial weakness and slurred speech suggest a possible medical emergency (stroke); requires immediate medical attention.
+I feel like I can't go on anymore and want to end my life.,Medical Questions,Medical Questions,emergency,emergency,"Content indicates suicidal ideation, a potential medical emergency requiring immediate mental health crisis intervention."
+"Severe chest pain and sweating, can I book a cardiology appointment?",Medical Questions,Medical Questions,emergency,emergency,"Describes severe chest pain and sweating, indicating a potential medical emergency; requires urgent attention."
+Can I set up a payment plan for my bill?,Billing,Billing,normal,normal,Routine billing inquiry about setting up a payment plan; no health-related content or urgency.
+I was charged twice for my visit last month. Can you fix it?,Billing,Billing,normal,normal,Customer reports being charged twice for a visit and asks for correction; no medical symptoms or urgency.
+Why is my bill higher than my estimate?,Billing,Billing,normal,normal,Billing discrepancy inquiry; not health-related and not time-sensitive.
+I need to reschedule my appointment next Tuesday.,Appointment,Appointment,normal,normal,Rescheduling an appointment; routine scheduling request with no urgency.
+What is your cancellation policy for appointments?,Appointment,Appointment,normal,normal,"Inquiry about appointment cancellation policy; administrative, no medical issue or urgency."
+Can I book a new patient appointment with a family doctor?,Appointment,Appointment,normal,normal,Simple scheduling request for a new patient appointment; no medical symptoms or urgency mentioned.
+How do I request a copy of my medical records?,Medical Records,Medical Records,normal,normal,The user asked how to request a copy of medical records; it's a routine request with no urgency.
+Please send my lab results to my new doctor.,Medical Records,Medical Records,normal,normal,"Request to share lab results with a new doctor; routine records transfer, no urgency."
+I need a refill of my blood pressure medication.,Prescription,Prescription,normal,normal,"Patient requests a refill of blood pressure medication; no symptoms or urgent issue described, this is a routine prescription refill."
+My pharmacy says my prescription was not sent. Can you check?,Prescription,Prescription,normal,normal,Pharmacy reports the prescription was not sent and needs to be checked to avoid medication delay; time-sensitive but not an emergency.
+Does Medicare cover my annual checkup?,Insurance,Insurance,normal,normal,Routine inquiry about Medicare coverage for an annual checkup; no urgency.
+I have had a mild cough for three days. Should I see a doctor?,Medical Questions,Medical Questions,normal,normal,Describes symptoms and asks about seeking medical care; not an emergency.
+Can I bring my service dog to my appointment?,Appointment,Appointment,normal,normal,Routine policy question about bringing a service dog to an appointment; no health issue or urgency.
+Where can I park when I visit the clinic?,Human Review,Appointment,normal,normal,The email is a logistical question about parking for a clinic visit; no medical issue or urgency mentioned.
+Are you hiring nurses right now?,Human Review,Human Review,no_documents,no_documents,"Recruitment inquiry (hiring nurses); no medical information, appointment, or urgent issue."
+Can you recommend a good dentist near the clinic?,Human Review,Medical Questions,no_documents,no_documents,"General inquiry about finding a dentist; no symptoms, health problem, or urgency described."
+Is there a cafeteria in the building?,Human Review,Human Review,no_documents,no_documents,No medical content; a general facilities question. Requires human routing to provide info about the building cafeteria.

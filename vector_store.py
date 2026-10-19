@@ -71,7 +71,7 @@ def retrieve_context(query):
         print("Similarity score:", match["score"])
         print("Source:", match["metadata"].get("source", "Unknown"))
 
-    similarity_threshold = 0.40
+    similarity_threshold = 0.35
 
     relevant_matches = [
         match for match in results["matches"]
